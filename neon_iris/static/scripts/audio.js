@@ -6,13 +6,14 @@ const AudioHandler = (() => {
   let volume;
   let sampleRate;
   let isRecording = false;
+  const getUserMedia = navigator.mediaDevices.getUserMedia;
 
   // Ensure the getUserMedia is correctly referenced
-  const getUserMedia =
-    navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia ||
-    navigator.msGetUserMedia;
+  // const getUserMedia =
+  //   navigator.mediaDevices.getUserMedia ||
+  //   navigator.webkitGetUserMedia ||
+  //   navigator.mozGetUserMedia ||
+  //   navigator.msGetUserMedia;
 
   const startAudio = () => {
     if (getUserMedia) {
