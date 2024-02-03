@@ -3,3 +3,6 @@ tests/
 *.egg-info
 build/
 dist/
+*.tar
+.venv
+tests

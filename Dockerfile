@@ -32,7 +32,7 @@ RUN if [ "$EXTRAS" = "gradio" ]; then \
     fi
 
 WORKDIR /neon_iris
-ADD . /neon_iris
+COPY . /neon_iris
 RUN pip install .
 
 COPY docker_overlay/ /

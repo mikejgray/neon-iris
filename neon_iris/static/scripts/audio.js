@@ -6,21 +6,12 @@ const AudioHandler = (() => {
   let volume;
   let sampleRate;
   let isRecording = false;
-  const getUserMedia = navigator.mediaDevices.getUserMedia;
-
-  // Ensure the getUserMedia is correctly referenced
-  // const getUserMedia =
-  //   navigator.mediaDevices.getUserMedia ||
-  //   navigator.webkitGetUserMedia ||
-  //   navigator.mozGetUserMedia ||
-  //   navigator.msGetUserMedia;
 
   const startAudio = () => {
-    if (getUserMedia) {
-      getUserMedia.call(
-        navigator,
-        { audio: true },
-        (stream) => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
           audioStream = stream;
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           audioContext = new AudioContext();
@@ -45,11 +36,10 @@ const AudioHandler = (() => {
           recorder.connect(audioContext.destination);
           WebSocketHandler.setSampleRate(sampleRate);
           isRecording = true;
-        },
-        (error) => {
+        })
+        .catch((error) => {
           console.error("Error capturing audio.", error);
-        }
-      );
+        });
     } else {
       console.error("getUserMedia not supported in this browser.");
     }
@@ -61,7 +51,7 @@ const AudioHandler = (() => {
         recorder.disconnect();
         volume.disconnect();
         // Disconnecting the audio context might not be necessary
-        // audioContext.close();
+        audioContext.close();
       }
       if (audioStream) {
         const tracks = audioStream.getTracks();
