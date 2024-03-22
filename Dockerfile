@@ -20,7 +20,7 @@ COPY --from=ffmpeg-base /usr/local/bin/ /usr/local/bin/
 COPY --from=ffmpeg-base /usr/local/lib/ /usr/local/lib/
 
 RUN mkdir -p /neon_iris/requirements
-COPY ./requirements/* /neon_iris/requirements
+COPY ./requirements/* /neon_iris/requirements/
 
 RUN pip install wheel && pip install -r /neon_iris/requirements/requirements.txt
 RUN if [ "$EXTRAS" = "gradio" ]; then \

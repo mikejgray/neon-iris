@@ -88,6 +88,8 @@ const AudioHandler = (() => {
 
 const startButton = document.getElementById("startButton");
 startButton.addEventListener("click", function () {
+  initializeVad();
+  WebSocketHandler;
   AudioHandler.toggle();
 
   // Update the button's text and class based on the recording state

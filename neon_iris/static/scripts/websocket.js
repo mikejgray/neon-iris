@@ -154,9 +154,3 @@ const WebSocketHandler = (() => {
     setSampleRate: (rate) => ws.send(rate),
   };
 })();
-
-// Initialize VAD when the page is ready
-window.addEventListener("DOMContentLoaded", (event) => {
-  initializeVad();
-});
-WebSocketHandler;
