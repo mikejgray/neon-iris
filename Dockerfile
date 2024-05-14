@@ -1,7 +1,3 @@
-# Stage 1: Use a base image to install ffmpeg
-FROM jrottenberg/ffmpeg:4.1 as ffmpeg-base
-
-# Stage 2: Build the final image
 FROM python:3.8-slim
 
 # Label for vendor
@@ -14,13 +10,11 @@ ARG EXTRAS
 ENV OVOS_CONFIG_BASE_FOLDER=neon \
     OVOS_CONFIG_FILENAME=neon.yaml \
     XDG_CONFIG_HOME=/config
-
-# Copy ffmpeg binaries from the ffmpeg-base stage
-COPY --from=ffmpeg-base /usr/local/bin/ /usr/local/bin/
-COPY --from=ffmpeg-base /usr/local/lib/ /usr/local/lib/
+# Set the ARG value as an environment variable
+ENV EXTRAS=${EXTRAS}
 
 RUN mkdir -p /neon_iris/requirements
-COPY ./requirements/* /neon_iris/requirements/
+COPY ./requirements/* /neon_iris/requirements
 
 RUN pip install wheel && pip install -r /neon_iris/requirements/requirements.txt
 RUN if [ "$EXTRAS" = "gradio" ]; then \
@@ -32,16 +26,16 @@ RUN if [ "$EXTRAS" = "gradio" ]; then \
     fi
 
 WORKDIR /neon_iris
-COPY . /neon_iris
+ADD . /neon_iris
 RUN pip install .
 
 COPY docker_overlay/ /
 
-# Expose port 8000 for websat
-EXPOSE 8000
-
-# Set the ARG value as an environment variable
-ENV EXTRAS=${EXTRAS}
+RUN apt-get update \
+  && apt-get install -y libsndfile1 libasound2 ffmpeg \
+  && apt-get --purge autoremove -y \
+  && apt-get clean \
+  && rm -rf "${HOME}"/.cache /var/lib/apt /var/log/{apt,dpkg.log}
 
 # Create a non-root user with a home directory and change ownership of necessary directories
 
