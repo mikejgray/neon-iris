@@ -42,7 +42,7 @@ from ovos_utils.json_helper import merge_dict
 from pika.exceptions import StreamLostError
 from neon_utils.configuration_utils import get_neon_user_config
 from neon_utils.metrics_utils import Stopwatch
-from neon_utils.mq_utils import NeonMQHandler
+from neon_mq_connector.utils.client_utils import NeonMQHandler
 from neon_utils.socket_utils import b64_to_dict
 from neon_utils.file_utils import decode_base64_string_to_file, \
     encode_file_to_base64_string
@@ -129,7 +129,7 @@ class NeonAIClient:
         Cleanly shuts down the MQ connection associated with this client
         """
         try:
-            self._connection.stop()
+            self._connection.shutdown()
         except Exception as e:
             LOG.error(e)
             try:
@@ -142,6 +142,7 @@ class NeonAIClient:
             except Exception as x:
                 LOG.exception(x)
                 LOG.error("Consumers not shutdown")
+            raise e
 
     def handle_neon_response(self, channel, method, _, body):
         """
@@ -389,7 +390,7 @@ class NeonAIClient:
                                         "neon_chat_api_error",
                                         self.handle_neon_error,
                                         auto_ack=False)
-        mq_connection.run(daemon=True)
+        mq_connection.run(daemonize_consumers=True)
         return mq_connection
 
 
