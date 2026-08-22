@@ -174,6 +174,12 @@ class NeonAIClient:
             self._handle_supported_languages(message)
         elif message.msg_type == "neon.alert_expired":
             self.handle_alert(message)
+        elif message.msg_type == "ovos.notification.api.notify":
+            self.handle_notification(message)
+        elif message.msg_type == "ovos.notification.api.dismiss":
+            self.handle_notification(message)
+        elif message.msg_type == "ovos.notification.api.snoozed":
+            self.handle_notification(message)
         elif message.msg_type.endswith(".response"):
             self.handle_api_response(message)
         else:
@@ -231,6 +237,21 @@ class NeonAIClient:
         """
         Override this method to handle alerts (timers, alarms, reminders)
         """
+
+    def handle_notification(self, message: Message):
+        """
+        Optionally override this method to render, remove, or hide
+        notifications from the Notification Manager. `message.msg_type`
+        distinguishes the event: `ovos.notification.api.notify` (render),
+        `ovos.notification.api.dismiss` (remove), or
+        `ovos.notification.api.snoozed` (hide until `renotify_at`).
+        The default implementation only logs the event.
+        @param message: Notification Message emitted by the Notification Manager
+        """
+        notification = message.data.get("notification") or dict()
+        notification_id = (message.data.get("notification_id") or
+                           notification.get("notification_id"))
+        LOG.info("%s notification_id=%s", message.msg_type, notification_id)
 
     def _handle_profile_update(self, message: Message):
         updated_profile = message.data["profile"]
